@@ -9,11 +9,18 @@
 #define ENCODEURB 4
 
 
+// Prérequis savoir utiliser les define
+// Partie à modifier pour indiquer en define quel pin est branché où A et B à brancher sur 2 et 4
+#define ENCODEURA_LEFT 2
+#define ENCODEURB_LEFT 4
 
-#define TRIGGER_PIN  12  // Arduino pin tied to trigger pin on the ultrasonic sensor.
-#define ECHO_PIN     11  // Arduino pin tied to echo pin on the ultrasonic sensor.
+
+#define TRIGGER_PIN_RIGHT  7  // Arduino pin tied to trigger pin on the ultrasonic sensor.
+#define ECHO_PIN_RIGHT      8  // Arduino pin tied to echo pin on the ultrasonic sensor.
 #define MAX_DISTANCE 200 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
 
+#define TRIGGER_PIN_LEFT  12  // Arduino pin tied to trigger pin on the ultrasonic sensor.
+#define ECHO_PIN_LEFT     13  // Arduino pin tied to echo pin on the ultrasonic sensor.
 
 // prérequis : volatile => pour toute variable qui sera utilise dans les interruptions 
 
@@ -22,22 +29,30 @@ volatile double speed =0; // vitesse du moteur
 volatile byte laststate =0;  // etat précédent de l'encodeur 
 
 
-// Contrôle PWM simple
-#define A 5 // Contrôle vitesse moteur 1
-#define B 6 //controle direction moteur 1
+//// Contrôle PWM simple
+//#define A_RIGHT 5 // Contrôle vitesse moteur 1
+//#define B_RIGHT 6 //controle direction moteur 1
 
 int SENSOR_PIN = 0; // center pin of the potentiometer
  
-int RPWM_Output = 5; // Arduino PWM output pin 5; connect to IBT-2 pin 1 (RPWM)
-int LPWM_Output = 6; // Arduino PWM output pin 6; connect to IBT-2 pin 2 (LPWM)
- 
-NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
+int RPWM_Output_RIGHT = 5; // Arduino PWM output pin 5; connect to IBT-2 pin 1 (RPWM)
+int LPWM_Output_RIGHT = 6; // Arduino PWM output pin 6; connect to IBT-2 pin 2 (LPWM)
 
+int RPWM_Output_LEFT = 10; // Arduino PWM output pin 5; connect to IBT-2 pin 1 (RPWM)
+int LPWM_Output_LEFT = 9; // Arduino PWM output pin 6; connect to IBT-2 pin 2 (LPWM)
+
+
+ 
+NewPing sonarLeft(TRIGGER_PIN_LEFT, ECHO_PIN_LEFT, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
+NewPing sonarRight(TRIGGER_PIN_RIGHT, ECHO_PIN_RIGHT, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
 
 void stop() //Stop
 {
-digitalWrite(A,LOW);
-digitalWrite(B,LOW);
+    digitalWrite(RPWM_Output_RIGHT,LOW);
+    digitalWrite(LPWM_Output_RIGHT,LOW);
+    
+    digitalWrite(RPWM_Output_LEFT,LOW);
+    digitalWrite(LPWM_Output_LEFT,LOW);
 }
 
 void advance(char a) // En avant
@@ -46,8 +61,13 @@ void advance(char a) // En avant
 //digitalWrite(B,HIGH);
 
     int reversePWM = 100;
-    analogWrite(LPWM_Output, 0);
-    analogWrite(RPWM_Output, reversePWM);
+    analogWrite(LPWM_Output_RIGHT, 0);
+    analogWrite(RPWM_Output_RIGHT, reversePWM);
+    
+    
+    analogWrite(LPWM_Output_LEFT, 0);
+    analogWrite(RPWM_Output_LEFT, reversePWM);
+    
     
 }
 
@@ -56,8 +76,12 @@ void back_off (char a) // En arrière
 //analogWrite (A,a);
 //digitalWrite(B,LOW);
    int forwardPWM  = 100;
-    analogWrite(LPWM_Output, forwardPWM);
-    analogWrite(RPWM_Output, 0);
+    analogWrite(LPWM_Output_RIGHT, forwardPWM);
+    analogWrite(RPWM_Output_RIGHT, 0);
+    
+    analogWrite(LPWM_Output_LEFT, forwardPWM);
+    analogWrite(RPWM_Output_LEFT, 0);
+    
 }
 
 void setup()
@@ -67,14 +91,13 @@ void setup()
  pinMode(ENCODEURB, INPUT_PULLUP);
  
  
-   pinMode(RPWM_Output, OUTPUT);
-  pinMode(LPWM_Output, OUTPUT);
-  
+ pinMode(RPWM_Output_RIGHT, OUTPUT);
+ pinMode(LPWM_Output_RIGHT, OUTPUT);
  
-//pinMode(A, OUTPUT);
-//pinMode(B, OUTPUT);
+ pinMode(RPWM_Output_LEFT, OUTPUT);
+ pinMode(LPWM_Output_LEFT, OUTPUT);
+ 
 
-//digitalPinToInterrupt(ENCODEURA)
 
 attachInterrupt(0,counter, CHANGE); // on crée l'interruption sur changement sur la pin 2 => interruption 0, la routine counter va se faire toute seule sans l'appeler à chaque changement d'état sur le pin 2
 
@@ -129,9 +152,13 @@ else stop();
 // Serial.println("");
 
   delay(50);                      // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
-  unsigned int uS = sonar.ping(); // Send ping, get ping time in microseconds (uS).
-  Serial.print("Ping: ");
-  Serial.print(sonar.convert_cm(uS)); // Convert ping time to distance and print result (0 = outside set distance range, no ping echo)
+  unsigned int uS = sonarLeft.ping(); // Send ping, get ping time in microseconds (uS).
+  unsigned int uS2 = sonarRight.ping(); // Send ping, get ping time in microseconds (uS).
+  Serial.print("Ping Left: ");
+  Serial.print(sonarLeft.convert_cm(uS)); // Convert ping time to distance and print result (0 = outside set distance range, no ping echo)
+  Serial.print("cm");
+  Serial.print("Ping Right: ");
+  Serial.print(sonarRight.convert_cm(uS2)); // Convert ping time to distance and print result (0 = outside set distance range, no ping echo)
   Serial.println("cm");
 
 }
