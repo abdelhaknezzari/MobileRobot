@@ -5,8 +5,8 @@
 
 // Prérequis savoir utiliser les define
 // Partie à modifier pour indiquer en define quel pin est branché où A et B à brancher sur 2 et 4
-#define ENCODEURA 2
-#define ENCODEURB 4
+#define ENCODEURA_LEFT 2
+#define ENCODEURB_LEFT 4
 
 
 // Prérequis savoir utiliser les define
@@ -35,11 +35,11 @@ volatile byte laststate =0;  // etat précédent de l'encodeur
 
 int SENSOR_PIN = 0; // center pin of the potentiometer
  
-int RPWM_Output_RIGHT = 5; // Arduino PWM output pin 5; connect to IBT-2 pin 1 (RPWM)
-int LPWM_Output_RIGHT = 6; // Arduino PWM output pin 6; connect to IBT-2 pin 2 (LPWM)
+int RPWM_Output_RIGHT = 9; // Arduino PWM output pin 9; connect to IBT-2 pin 1 (RPWM)
+int LPWM_Output_RIGHT = 11; // Arduino PWM output pin 11; connect to IBT-2 pin 2 (LPWM)
 
-int RPWM_Output_LEFT = 10; // Arduino PWM output pin 5; connect to IBT-2 pin 1 (RPWM)
-int LPWM_Output_LEFT = 9; // Arduino PWM output pin 6; connect to IBT-2 pin 2 (LPWM)
+int RPWM_Output_LEFT = 5; // Arduino PWM output pin 5; connect to IBT-2 pin 1 (RPWM)
+int LPWM_Output_LEFT = 6; // Arduino PWM output pin 6; connect to IBT-2 pin 2 (LPWM)
 
 
  
@@ -87,8 +87,8 @@ void back_off (char a) // En arrière
 void setup()
 {
 // on initialise les entrées et sorties
- pinMode(ENCODEURA, INPUT_PULLUP);
- pinMode(ENCODEURB, INPUT_PULLUP);
+ pinMode(ENCODEURA_LEFT, INPUT_PULLUP);
+ pinMode(ENCODEURB_LEFT, INPUT_PULLUP);
  
  
  pinMode(RPWM_Output_RIGHT, OUTPUT);
@@ -174,7 +174,7 @@ void counter()
   // Modifier le MASK  B01111011 par BXXXXXXXX mettre des 0 là où sont les pins utilisés par l'encodeur
   if( state!=laststate)
   {
-    (((state&(1<<ENCODEURA))>>ENCODEURA)^((state&(1<<ENCODEURB))>>ENCODEURB))?count--:count++;
+    (((state&(1<<ENCODEURA_LEFT))>>ENCODEURA_LEFT)^((state&(1<<ENCODEURB_LEFT))>>ENCODEURB_LEFT))?count--:count++;
     laststate=state;
   }
   

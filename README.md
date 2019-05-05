@@ -22,3 +22,11 @@ git commit
 git push origin master
 
 
+
+## Staging
+* git add  ./*
+
+
+* git status
+
+
