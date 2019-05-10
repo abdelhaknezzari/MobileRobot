@@ -16,6 +16,10 @@ int val = 15;
  
 NewPing sonarLeft(TRIGGER_PIN_LEFT, ECHO_PIN_LEFT, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
 NewPing sonarRight(TRIGGER_PIN_RIGHT, ECHO_PIN_RIGHT, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
+
+
+
+
 void setup()
 {
   
@@ -26,43 +30,49 @@ void setup()
 }
 
 
+double getSonarDistance(NewPing sonar )
+{
+  delay(150);                      // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
+  unsigned int uS = sonar.ping(); // Send ping, get ping time in microseconds (uS).
+  if(uS == 0)
+  {
+    uS = 5000;
+    }
+  return sonar.convert_cm(uS);
+ }
 
+double getSteeringAngle(double rightObstacle, double leftObstacle)
+{
 
+//   double threashouldDistance = 18.0;
+//  
+//   if(leftObstacle > threashouldDistance)  leftObstacle  = 100000;
+//   if(rightObstacle > threashouldDistance) rightObstacle = 100000;
+//   double angle = 90.0 * ( threashouldDistance/(threashouldDistance + leftObstacle ) - threashouldDistance/(threashouldDistance + rightObstacle )  ) + 90;
+
+  double angle = 90 * ( exp(-0.057 * rightObstacle )  - exp(-0.057 * leftObstacle )  ) + 90 ;
+
+  return angle;
+   
+ }
 
 void loop()
 {
+  double anglLeft  =  getSonarDistance(sonarLeft);
+  double anglRight =  getSonarDistance(sonarRight); 
 
-    
-  delay(100);                      // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
-  unsigned int uS = sonarLeft.ping(); // Send ping, get ping time in microseconds (uS).
-  unsigned int uS2 = sonarRight.ping(); // Send ping, get ping time in microseconds (uS).
   Serial.print("Ping Left: ");
-  Serial.print(sonarLeft.convert_cm(uS)); // Convert ping time to distance and print result (0 = outside set distance range, no ping echo)
+  Serial.print(anglLeft); // Convert ping time to distance and print result (0 = outside set distance range, no ping echo)
   Serial.print("cm");
   Serial.print("Ping Right: ");
-  Serial.print(sonarRight.convert_cm(uS2)); // Convert ping time to distance and print result (0 = outside set distance range, no ping echo)
+  Serial.print(anglRight ); // Convert ping time to distance and print result (0 = outside set distance range, no ping echo)
   Serial.print("cm");    
   
-
-  
-  double anglLeft  = sonarLeft.convert_cm(uS);
-  double anglRight = sonarRight.convert_cm(uS2);
-  
-
-  if(anglLeft > 15) anglLeft = 1000;
-  if(anglRight > 15) anglRight = 1000;
-
-  double angle = 90.0 * ( 15.0/(15.0 + anglLeft ) - 15.0/(15.0 + anglRight )  );
-  if(angle < 0)
-  {
-    angle += 360;
-  }
+  double angle = getSteeringAngle(anglLeft,anglRight);
   
   Serial.print("  angle :");
   Serial.println(angle);
   
   myservo.write(angle ) ; 
   
-
-
 }

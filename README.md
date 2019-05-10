@@ -28,5 +28,11 @@ git push origin master
 
 
 * git status
+* 
+
+## Arduino nano pinout
+![arduino nano](nanoPinout.png)
+
+
 
 
