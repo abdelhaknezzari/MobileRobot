@@ -142,36 +142,91 @@ void loop()
 //Serial.println(speed_right); 
 
 
-// float sensorValue0 = analogRead(A0) / 650;  
-// float sensorValue1 = analogRead(A4) / 650;  
-// float sensorValue2 = analogRead(A3) / 650;  
-// float sensorValue3 = analogRead(A2) / 650;                             
-// float sensorValue4 = analogRead(A1) / 650;  
-// float sensorValue5 = analogRead(A5) / 650;  
-//  
-// 
-// Serial.print(" A0: ");Serial.print(sensorValue0);
-// Serial.print(" A1: ");Serial.print(sensorValue1);
-// Serial.print(" A2: ");Serial.print(sensorValue2);
-// Serial.print(" A3: ");Serial.print(sensorValue3);
-// Serial.print(" A4: ");Serial.print(sensorValue4);
-// Serial.print(" A5: ");Serial.print(sensorValue5);
-// Serial.println("");
+ double sensorValue0 = analogRead(A0) ;  
+ double sensorValue1 = analogRead(A1) ;  
+ double sensorValue2 = analogRead(A2) ;  
+ double sensorValue3 = analogRead(A3) ;                             
+ double sensorValue4 = analogRead(A4) ;  
+ double sensorValue5 = analogRead(A5) ;  
+ double sensorValue6 = analogRead(A6) ;    
+ double sensorValue7 = analogRead(A7) ; 
+  
+ Serial.print(" A0: ");Serial.print(getReflectanceValue(sensorValue0,'0'));
+ Serial.print(" A1: ");Serial.print(getReflectanceValue(sensorValue1,'1'));
+ Serial.print(" A2: ");Serial.print(getReflectanceValue(sensorValue2,'2'));
+ Serial.print(" A3: ");Serial.print(getReflectanceValue(sensorValue3,'3'));
+ Serial.print(" A4: ");Serial.print(getReflectanceValue(sensorValue4,'4'));
+ Serial.print(" A5: ");Serial.print(getReflectanceValue(sensorValue5,'5'));
+ Serial.print(" A6: ");Serial.print(getReflectanceValue(sensorValue6,'6'));
+ Serial.print(" A7: ");Serial.print(getReflectanceValue(sensorValue7,'7'));
+ Serial.println("");
 
-  delay(50);                      // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
-  unsigned int uS = sonarLeft.ping(); // Send ping, get ping time in microseconds (uS).
-  unsigned int uS2 = sonarRight.ping(); // Send ping, get ping time in microseconds (uS).
-  Serial.print("Ping Left: ");
-  Serial.print(sonarLeft.convert_cm(uS)); // Convert ping time to distance and print result (0 = outside set distance range, no ping echo)
-  Serial.print("cm");
-  Serial.print("Ping Right: ");
-  Serial.print(sonarRight.convert_cm(uS2)); // Convert ping time to distance and print result (0 = outside set distance range, no ping echo)
-  Serial.println("cm");
+//  delay(50);                      // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
+//  unsigned int uS = sonarLeft.ping(); // Send ping, get ping time in microseconds (uS).
+//  unsigned int uS2 = sonarRight.ping(); // Send ping, get ping time in microseconds (uS).
+//  Serial.print("Ping Left: ");
+//  Serial.print(sonarLeft.convert_cm(uS)); // Convert ping time to distance and print result (0 = outside set distance range, no ping echo)
+//  Serial.print("cm");
+//  Serial.print("Ping Right: ");
+//  Serial.print(sonarRight.convert_cm(uS2)); // Convert ping time to distance and print result (0 = outside set distance range, no ping echo)
+//  Serial.println("cm");
 
 }
 
 
 // Encoder counter 0
+
+
+boolean getReflectanceValue(double value,char ledName)
+{
+ 
+    switch(ledName)
+    {
+    case '0':// En avant si touche "z"
+        if(value < 668.0) return true;
+        else return false;
+         break; 
+       
+    case '1':// En arrière si touche "s"
+        if(value < 668.0) return true;
+        else return false;
+         break; 
+    case '2': 
+        if(value < 668.0) return true;
+        else return false;
+        break; 
+        
+    case '3': 
+      if(value < 668.0) return true;
+      else return false;
+      break; 
+        
+     case '4': 
+        if(value < 668.0) return true;
+        else return false;
+        break; 
+        
+     case '5': 
+        if(value < 668.0) return true;
+        else return false;
+        break; 
+        
+      case '6': 
+        if(value < 668.0) return true;
+        else return false;
+        break; 
+        
+      case '7': 
+        if(value < 668.0) return true;
+        else return false;
+        break;    
+        
+    }
+    
+    
+
+}
+
 
 void counter_left()
 {

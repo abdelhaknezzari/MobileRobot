@@ -30,6 +30,13 @@ git push origin master
 * git status
 * 
 
+
+# get changes from remote branch
+git checkout master
+git pull
+
+
+
 ## Arduino nano pinout
 ![arduino nano](nanoPinout.png)
 
