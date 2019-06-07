@@ -10,13 +10,13 @@
 
 
 // Prérequis savoir utiliser les define
-// Partie à modifier pour indiquer en define quel pin est branché où A et B à brancher sur 3 et 10
+// Partie à modifier pour indiquer en define quel pin est branché où A et B à brancher sur 3 7
 #define ENCODEURA_RIGHT 3
-#define ENCODEURB_RIGHT 7
+#define ENCODEURB_RIGHT 5 //7
 
-
-#define TRIGGER_PIN_RIGHT  10  // Arduino pin tied to trigger pin on the ultrasonic sensor   7.
-#define ECHO_PIN_RIGHT      8  // Arduino pin tied to echo pin on the ultrasonic sensor.
+//Arduino pin tied to trigger pin on the ultrasonic sensor  
+#define TRIGGER_PIN_RIGHT  10  // 
+#define ECHO_PIN_RIGHT      11 //8  // 
 #define MAX_DISTANCE 200 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
 
 #define TRIGGER_PIN_LEFT  12  // Arduino pin tied to trigger pin on the ultrasonic sensor.
@@ -33,11 +33,13 @@ volatile int count_right =0; // comptage de tick d'encoder  qui sera incrément�
 volatile double speed_right =0; // vitesse du moteur 
 volatile byte laststate_right =0;  // etat précédent de l'encodeur 
 
+volatile boolean onlyOnce = false;
+
  
 int RPWM_Output_RIGHT = 9; // Arduino PWM output pin 9; connect to IBT-2 pin 1 (RPWM)
-int LPWM_Output_RIGHT = 11; // Arduino PWM output pin 11; connect to IBT-2 pin 2 (LPWM)
+int LPWM_Output_RIGHT = 8; //11; // Arduino PWM output pin 11; connect to IBT-2 pin 2 (LPWM)
 
-int RPWM_Output_LEFT = 5; // Arduino PWM output pin 5; connect to IBT-2 pin 1 (RPWM)
+int RPWM_Output_LEFT = 7; //5; // Arduino PWM output pin 5; connect to IBT-2 pin 1 (RPWM)
 int LPWM_Output_LEFT = 6; // Arduino PWM output pin 6; connect to IBT-2 pin 2 (LPWM)
 
 
@@ -109,6 +111,9 @@ Timer1.attachInterrupt( timerIsr ); // attach the service routine here la foncti
 
 Serial.begin(9600); // Définit vitesse de transmission série
 Serial.println("Execution du controle par clavier");
+
+getStateEncoder(B00000011, B10000011);
+
 }
 
 void loop()
@@ -151,15 +156,15 @@ void loop()
  double sensorValue6 = analogRead(A6) ;    
  double sensorValue7 = analogRead(A7) ; 
   
- Serial.print(" A0: ");Serial.print(getReflectanceValue(sensorValue0,'0'));
- Serial.print(" A1: ");Serial.print(getReflectanceValue(sensorValue1,'1'));
- Serial.print(" A2: ");Serial.print(getReflectanceValue(sensorValue2,'2'));
- Serial.print(" A3: ");Serial.print(getReflectanceValue(sensorValue3,'3'));
- Serial.print(" A4: ");Serial.print(getReflectanceValue(sensorValue4,'4'));
- Serial.print(" A5: ");Serial.print(getReflectanceValue(sensorValue5,'5'));
- Serial.print(" A6: ");Serial.print(getReflectanceValue(sensorValue6,'6'));
- Serial.print(" A7: ");Serial.print(getReflectanceValue(sensorValue7,'7'));
- Serial.println("");
+// Serial.print(" A0: ");Serial.print(getReflectanceValue(sensorValue0,'0'));
+// Serial.print(" A1: ");Serial.print(getReflectanceValue(sensorValue1,'1'));
+// Serial.print(" A2: ");Serial.print(getReflectanceValue(sensorValue2,'2'));
+// Serial.print(" A3: ");Serial.print(getReflectanceValue(sensorValue3,'3'));
+// Serial.print(" A4: ");Serial.print(getReflectanceValue(sensorValue4,'4'));
+// Serial.print(" A5: ");Serial.print(getReflectanceValue(sensorValue5,'5'));
+// Serial.print(" A6: ");Serial.print(getReflectanceValue(sensorValue6,'6'));
+// Serial.print(" A7: ");Serial.print(getReflectanceValue(sensorValue7,'7'));
+// Serial.println("");
 
 //  delay(50);                      // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
 //  unsigned int uS = sonarLeft.ping(); // Send ping, get ping time in microseconds (uS).
@@ -226,6 +231,80 @@ boolean getReflectanceValue(double value,char ledName)
     
 
 }
+
+
+void printBinaryByte(byte value)
+{
+    Serial.print("B");
+    for (byte mask = 0x80; mask; mask >>= 1) 
+    {
+        Serial.print((mask & value) ? '1' : '0');
+    }
+    Serial.println();
+}
+
+
+
+byte getStateEncoder(byte reg1, byte reg2)
+{
+
+     byte mask1 = B00000000;
+     
+     mask1 = bitSet(mask1,0);
+     mask1 = bitSet(mask1,1);
+     
+     reg1 &= mask1;
+     reg2 &= mask1;
+     
+     reg2 <<= 4;
+     
+     printBinaryByte(reg1 | reg2 );
+     return reg1 | reg2 ;
+
+}
+
+
+void counter_left2()
+{
+  byte state =getStateEncoder(PIND,PINH);
+
+  int encA_left = 0;
+  int encB_left = 0;
+  
+  if( state!=laststate_left)
+  {
+    (((state&(1<<encA_left))>>encA_left)^((state&(1<<encB_left))>>encB_left))?count_left--:count_left++;
+    laststate_left=state;
+  }
+ 
+}
+
+
+
+void counterCommoun()
+{
+
+
+}
+
+
+void counter_right2()
+{
+  byte state =getStateEncoder(PIND,PINH);
+  
+  int encA_right = 1;
+  int encB_right = 1;
+  
+  if( state!=laststate_right)
+  {
+    (((state&(1<<encA_right))>>encA_right)^((state&(1<<encB_right))>>encB_right))?count_right--:count_right++;
+    laststate_right=state;
+  }
+
+  
+}
+
+
 
 
 void counter_left()
